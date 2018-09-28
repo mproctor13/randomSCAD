@@ -1,6 +1,6 @@
 /*%cube(300, center=true);*/
 faces=60;
-pipe_dia=77;
+pipe_dia=48;
 con_dia=35;
 
 /*pipe_clamp2();*/
@@ -12,29 +12,45 @@ con_dia=35;
   cylinder(d=pipe_dia,h=300, $fn=faces, center=true);
 }*/
 /*import("tie/tie_advanced.stl");*/
-
-difference(){
-  union(){
-    rotate_extrude(convexity=10, $fn=faces)
-      translate([pipe_dia/2, 0, 0]) circle(d=con_dia);
-    translate([0, pipe_dia/4, 0]) sphere(d=90, $fn=faces);
-    translate([0, pipe_dia/4, 0]) rotate([-90,0,0]) cylinder(d=90,h=40, $fn=faces);
-    /*hull() for(Y=[49, 10]) translate([0, Y, 0]) rotate([0,90,0]) cylinder(d=20,h=100, $fn=faces, center=true);*/
-
+pipe_holder(part=0);
+module pipe_holder(part=0){
+  if(part == 1){
+    difference(){
+      pipe_holder_internal();
+      translate([0, -50, 0]) cube(100, center=true);
+    }
   }
-  translate([0, 40, 0]) rotate([-90,0,0]) cylinder(d=pipe_dia,h=200, $fn=faces);
-  cylinder(d=pipe_dia,h=300, $fn=faces, center=true);
-  translate([0,50,0]) rotate([0,90,0]){
-    cylinder(d=5.4,h=110, $fn=faces, center=true);
+  else if(part == 2){
+    intersection(){
+      pipe_holder_internal();
+      translate([0, -50, 0]) cube(100, center=true);
+    }
   }
-
-
-  /*%for(X=[-1,1]) translate([70*X,30,7.5*Z]) rotate([0,90,0])
-    cylinder(d=12,h=50, $fn=faces, center=true);*/
+  else{
+    pipe_holder_internal();
+  }
 }
 
-/*cylinder(d=pipe_dia,h=300, $fn=faces, center=true);
-translate([0, 45, 0]) rotate([-90,0,0]) cylinder(d=pipe_dia,h=200, $fn=faces);*/
+module pipe_holder_internal(){
+  difference(){
+    union(){
+      translate([0, pipe_dia/4, 0]) sphere(d=90, $fn=faces);
+
+    }
+    translate([0, 25, 0]) rotate([-90,0,0]) cylinder(d=pipe_dia,h=100, $fn=faces);
+    cylinder(d=pipe_dia,h=300, $fn=faces, center=true);
+    translate([0,37.5,0]) rotate([0,90,0]){
+      cylinder(d=5.4,h=110, $fn=60, center=true);
+      for(Z=[-1,1]) translate([0,0,(pipe_dia+10)*Z]) cylinder(d=12,h=50, $fn=faces, center=true);
+      cylinder(d=10,h=pipe_dia+10, $fn=faces, center=true);
+    }
+    for(X=[-1,1]) translate([35*X,0,0]) {
+      rotate([90,0,0]) cylinder(d=5.4,h=110, $fn=60, center=true);
+      for(Y=[-1,1]) translate([0,30*Y,0]) rotate([90,0,0]) cylinder(d=12,h=50, $fn=faces, center=true);
+    }
+    /*for(Z=[-1,1]) translate([0,0,(pipe_dia+10)*Z]) cylinder(d=12,h=50, $fn=faces, center=true);*/
+  }
+}
 
 module pipe_clamp2(){
   difference(){
