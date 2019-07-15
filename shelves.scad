@@ -10,19 +10,19 @@ module tube(length=30, width=1, depth=1){
 module main_tube(){
     difference(){
         tube(36);
-        for(Y=[-1,1]) translate([0,((18*25.4)+8.5)*Y,0]) rotate([45*Y,0,0]) 
+        for(Y=[-1,1]) translate([0,((18*25.4)+8.5)*Y,0]) rotate([45*Y,0,0])
             cube([30,30,90], center=true);
     }
 }
 
 module upright_frame(){
     for(Y=[-1,1]) translate([0,(17.5*25.4)*Y,(18*25.4)]) rotate([90*Y,0,0]) main_tube();
-    translate([0,0,(0.5*25.4)]) rotate([0,R,0]) main_tube();
+    translate([0,0,(0.5*25.4)]) rotate([0,0,0]) main_tube();
     translate([0,0,(35.5*25.4)]) rotate([0,180,0]) main_tube();
 }
 
 module shelf(width=36, depth=15.5, height=0.75){
-    color("grey") 
+    color("grey")
     difference(){
         cube([depth*25.4,width*25.4,height*25.4], center=true);
         translate([0,0,-0.8]) cube([(depth*25.4)-0.8,(width*25.4)-0.8,height*25.4], center=true);
@@ -38,5 +38,9 @@ for(Y=[-17.5, -14, 14, 17.5]) translate([0,Y*25.4,(35.5*25.4)]) rotate([0,0,90])
 
 
 for(Y=[-17.5, -14, 14, 17.5]) translate([0,Y*25.4,(0.5*25.4)]) rotate([0,0,90]) tube(length=16);
-//shelf();
+
+for(Z=[12, 24]) translate([0,0,(Z*25.4)]) shelf();
+
+for(Z=[0, 18]) translate([-(9*25.4), 0, (9*25.4)+(Z*25.4)]) rotate([0,90,0]) shelf();
+
 for(X=[-1,1]) translate([(8*25.4)*X,0,0]) upright_frame();
