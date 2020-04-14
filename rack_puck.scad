@@ -9,7 +9,7 @@ bar_dia=26;
 rack_puck();
 //rack_tube();
 //%for(Y=[-1,1]) translate([(-(height/2)-5),((height/2)-3.5)*Y,height/2]) rotate([90,0,90]) cylinder(d=3.5, h=height+100, $fn=60);
-rack_template();
+//rack_template();
 
 module rack_puck(type="back"){
     if(type == "front"){
@@ -63,7 +63,7 @@ module rack_tube(){
     translate([0,0,-50]) color("silver") cylinder(d=bar_dia-1, h=height+100, $fn=60, center=false);
 }
 
-module rack_template(dia=2){
+module rack_template(dia=5){
     difference(){
         translate([17,0,18]) cube([15,50,30], center=true);
         translate([0,0,20+5]) cube([46,46,40], center=true);
