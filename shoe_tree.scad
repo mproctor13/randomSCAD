@@ -185,7 +185,8 @@ module pipes(height=500){
         %rotate([0,0,12*R]) translate([0,-250,0])
             translate([0,40,2.5]) 
                 cylinder(d=pipe_dia, h=height, center=true);
- }
+}
+
 module shoe_support(tongue_length=100, linked=false){
     difference(){
         intersection(){
