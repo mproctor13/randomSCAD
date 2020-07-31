@@ -1,4 +1,5 @@
-//layout=[4,3];
+//layout=[3,4];
+//layout=[2,3];
 layout=[4,6];
 thickness=6;
 div_thickness=3;
@@ -8,9 +9,12 @@ lid_height=30;
 material_depth=304;
 material_width=609.6;
 
+upright=true;
+handle_width=85;
+
 // champain bottle
-//bottle_height=299;
-//bottle_width=85;
+bottle_height=299;
+bottle_width=85;
 
 // 750ml bottle
 //bottle_height=291;
@@ -29,11 +33,17 @@ bottle_width=65.5;
 //bottle_width=71;
 
 div_height=bottle_height/2;
+side_length=layout[1]*bottle_width+
+             (layout[1]-1)*div_thickness+
+             thickness*2;
+end_length=layout[0]*bottle_width+
+             (layout[0]-1)*div_thickness+
+             thickness*2;
 
-//cube([300, 600, 6],center=true);
+%cube([300, 600, 6]);
 //bottles();
 case();
-bottles24();
+//bottles24();
 //end();
 //inside();
 //outside();
@@ -105,76 +115,84 @@ module bottom(){
 }
 
 module case(){
-  %translate([-(bottle_width+thickness)*1.5, 0, 0]) outside();
-  translate([-(bottle_width+thickness)*.5, 0, 0]) inside();
-  translate([(bottle_width+thickness)*.5, 0, 0]) inside();
-  %translate([(bottle_width+thickness)*1.5, 0, 0]) outside();
-    
-  translate([0, -(bottle_width+thickness)*2, 0]) end();
-  translate([0, -bottle_width-thickness, 0]) divider();
-  divider();
-  translate([0, bottle_width+thickness, 0]) divider();
-  translate([0, (bottle_width+thickness)*2, 0]) end();
+//  translate([0, -thickness/2, 0]) outside();
+//  translate([end_length-thickness, -thickness/2, 0]) outside();
+  if(upright){
+    for(X=[1:1:layout[0]-1])
+      translate([(bottle_width+div_thickness)*X, 0, 0])
+        inside();
+  
+    for(Y=[1:1:layout[1]-1])
+      translate([-thickness/2, div_thickness/2+(bottle_width+  div_thickness)*Y,0])
+        divider();
+  }
+//  translate([0, side_length-thickness, 0]) end();
+  translate([0, 0, 0]) end();
 }
 
 module outside(){
   difference(){
-    translate([0,0,bottle_height/2]) 
-      cube([thickness, (bottle_width)*4+thickness*5, bottle_height],center=true);
-    for(Y=[-1,1], Z=[30:40:bottle_height])
-      translate([0, (bottle_width+thickness)*2*Y,Z]) 
+    translate([-thickness/2,0,0])
+      cube([thickness, side_length, bottle_height]);
+    for(Y=[thickness/2,side_length-thickness/2], Z=[30:40:bottle_height])
+      translate([0, Y, Z]) 
         cube([thickness+2, ct, ch], center=true);
-    for(Y=[-0.5,0,0.5], Z=[30:40:div_height+1])
-      translate([0, (bottle_width*2+thickness*2)*Y,Z]) 
+    for(Y=[1:1:layout[1]-1], Z=[30:40:div_height+1])
+      translate([0, -div_thickness/2+thickness+(bottle_width+div_thickness)*Y,Z]) 
         cube([thickness+2, div_thickness, ch], center=true);
   }
 }
 
 module inside(){
   difference(){
-    translate([0,0,div_height/2]) 
-      cube([div_thickness, (bottle_width)*4+thickness*5, div_height],center=true);
+    translate([0,-thickness/2,0]) 
+      cube([div_thickness, side_length, div_height]);
     
-    for(Y=[-1,0,1]) translate([0, (bottle_width+thickness)*Y, div_height/4]) 
+    for(Y=[1:1:layout[1]-1])
+    translate([0, div_thickness/2+(bottle_width+div_thickness)*Y,div_height*.25])
       cube([thickness+2, div_thickness, div_height/2], center=true);
-    for(Y=[-1,1], Z=[30:40:bottle_height])
-      translate([0, (bottle_width+thickness)*2*Y,Z]) 
+    for(Y=[0,side_length-thickness], Z=[30:40:bottle_height])
+      translate([0, Y, Z]) 
         cube([thickness+2, ct, ch], center=true);
   }
 }
 
 module end(){
   difference(){
-    translate([0,0,bottle_height/2]) 
-      cube([bottle_width*3+thickness*4, thickness, bottle_height],center=true);
-    hull()
-      for(X=[-1,1]) rotate([90,0,0]) translate([(bottle_width/2-15)*X, bottle_height-lid_height-15, 0]) 
+    translate([-thickness/2,-thickness/2,0]) 
+      cube([end_length, thickness, bottle_height],center=false);
+     translate([end_length/2, 0, 0])
+    %hull()
+      for(X=[-1,1]) rotate([90,0,0]) translate([(handle_width/2-15)*X, bottle_height-lid_height-15, 0]) 
         cylinder(d=30,h=thickness+2, center=true);
-    for(X=[-3,3], Z=[10:40:bottle_height])
-      translate([(bottle_width+thickness)/2*X,0,Z]) 
+    for(X=[0,end_length-thickness], Z=[10:40:bottle_height])
+      translate([X,0,Z]) 
         cube([ct, thickness+2, ch], center=true);
-    for(X=[-1,1], Z=[10:40:div_height])
-      translate([(bottle_width+thickness)/2*X,0,Z]) 
+    
+    if(upright){
+      for(X=[1:1:layout[0]-1], Z=[10:40:div_height])
+        translate([div_thickness/2+(bottle_width+div_thickness)*X, 0, Z])
         cube([div_thickness, thickness+2, ch], center=true);
+    }
   }
 }
 
 module divider(){
   difference(){
-    translate([0,0,div_height/2]) 
-      cube([bottle_width*3+thickness*4, div_thickness, div_height],center=true);
-    for(X=[-3,3], Z=[10:40:bottle_height])
-      translate([(bottle_width+thickness)/2*X,0,Z]) 
+    translate([0,-div_thickness/2,0]) 
+      cube([end_length, div_thickness, div_height]);
+    for(X=[thickness/2,end_length-thickness/2], Z=[10:40:div_height])
+      translate([X,0,Z]) 
         cube([ct, thickness+2, ch], center=true);
-    for(X=[-1,1]) 
-      translate([(bottle_width+thickness)/2*X, 0, div_height*.75]) 
+    for(X=[1:1:layout[0]-1]) 
+      translate([thickness/2+div_thickness/2+(bottle_width+div_thickness)*X, 0, div_height*.75]) 
         cube([div_thickness, thickness+2, div_height/2], center=true);
   }
 }
 
 module bottles24(){
-  for(X=[-2,-1,0,1,2], Y=[-1.5,-0.5,0.5,1.5]) 
-    translate([(bottle_width+thickness)*X,(bottle_width+thickness)*Y,0]) 
+  for(X=[0:1:layout[0]-1], Y=[0:1:layout[1]-1]) 
+    translate([((bottle_width+thickness)/2)+(bottle_width+div_thickness)*X,(bottle_width+thickness)/2+(bottle_width+div_thickness)*Y,0]) 
       %bottle();
 }
 
