@@ -1,4 +1,4 @@
-$fn=120;
+$fn=60;
 sfn=30;
 fudge=0.3;
 side_spacing=248;
@@ -21,7 +21,7 @@ thickness=3.5;
 //    vertical_side_panel_support();
 //translate([-234/2,-180,0])
 //rotate([90,0,0])
-door_assembly();
+//door_assembly();
 //for(X=[-1,1])
 //translate([175*X,0,0])
 //rotate([0,0,90*X]) side_assembly();
@@ -29,9 +29,9 @@ door_assembly();
 
 //translate([-141,11,0]) import("../printer/camera-mount.stl");
 
-//camera_mount();
+translate([107.5,60+35,-5]) rotate([0,90,0]) door_camera_mount(height=35);
 //top_enclosure();
-
+//test_template2();
     
 module export_door(){
     projection(cut = true) rotate([0,0,0]) door();
@@ -48,6 +48,9 @@ module door(){
             cylinder(d=4.2+fudge, h=10, center=true); 
         for(X=[224,233]) translate([X, 0, 0])
             cylinder(d=4.2+fudge, h=10, center=true);
+        translate([120,45,0])
+            for(X=[-1,1]) translate([7*X,0,-1]) 
+                cylinder(d=3.8, h=thickness+2);
     }
 }
 
@@ -62,6 +65,33 @@ module top_enclosure(){
     translate([0,0,height/2]) 
         %cube([width, depth, height], center=true);
     
+}
+
+module door_camera_mount(down_tilt=10, height=0){
+    difference(){
+        union(){
+            hull(){
+                cylinder(d=9, h=25);
+                translate([-5,-4.5,0]) cube([1,9,25]);
+                translate([-5,-height-20,0])
+                    cube([5,height+20,25]);
+            }
+        }
+        translate([0,0,5]) rotate([0,0,-down_tilt]) hull(){
+            cylinder(d=10, h=15.5);
+            translate([10,-5,0]) cube([1,10,15.5]);
+        }
+        translate([0,0,-0.5]) cylinder(d=3.8, h=26);
+        translate([0,0,0.7]) fhex(5.6,1.5);
+        translate([0,-5,5]) cube([30,10,15.5]);
+        
+        for(Z=[-7,7]){
+            translate([0,-height-15,12.5+Z]) rotate([0,90,0]) 
+                cylinder(d=3.8, h=26, center=true);
+            translate([0,-height-15,12.5+Z]) rotate([0,90,0]) 
+                fhex(m3_hex_nut,5);
+        }
+    }
 }
 
 module camera_mount(height=30){
@@ -222,6 +252,36 @@ module handle(){
     
 }
 
+module test_template2(thickness=3.2){
+//    265
+    difference(){
+        union(){
+            hull() for(Y=[-1,1], X=[-1,0])
+                translate([8*X,185/2*Y,0]) 
+                cylinder(d=10, h=thickness);
+            translate([227, 0, 0])
+            hull() for(X=[0,15]) translate([X,0,0]) cylinder(d=15, h=thickness);
+            for(Y=[-1,1])
+            hull(){
+                translate([0,185/2*Y,0]) cylinder(d=5, h=3);
+                translate([227,0,0]) cylinder(d=5, h=3);
+            }
+            translate([265/2-12.5,45,0])
+            hull() for(X=[-1,1])
+            translate([7*X,0,0]) cylinder(d=10, h=thickness);
+        }
+        for(Y=[-92.5,-67.5,67.5,92.5]) translate([0, Y, 0])
+            cylinder(d=4.2+fudge, h=10, center=true); 
+        for(X=[224,233]) translate([X, 0, 0])
+            cylinder(d=4.2+fudge, h=10, center=true);
+        translate([227+15, 0, 2.9])
+            cylinder(d=11.1125+fudge, h=thickness);
+        translate([120,45,0])
+            for(X=[-1,1])
+            translate([7*X,0,-1]) cylinder(d=3.8, h=thickness+2);
+    }
+}
+
 module test_template(thickness=3.2){
     translate([-27,0,-6.5])
     difference(){
@@ -252,7 +312,7 @@ module magnet(){
 
 module door_assembly(){
     width=234;
-//    translate([35,0,0]) test_template();
+    translate([35,0,0]) test_template();
     translate([8,0,-thickness]) %door();
     translate([width,0,0]) handle();
     for(Y=[-80,80]){

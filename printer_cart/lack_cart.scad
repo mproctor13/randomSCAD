@@ -47,11 +47,11 @@ fudge=0.2;
 //    rotate([0,0,-90]) drawer_support();
 //    rotate([0,0,90]) drawer_support();
 
-%cube([100,180,100], center=true);
-lack_back();
+//%cube([100,180,100], center=true);
+//lack_back();
 
 
-//lack_spacer();
+lack_spacer();
 //lack_cart();
 //lack_back();
 //lack_spacer_back();
