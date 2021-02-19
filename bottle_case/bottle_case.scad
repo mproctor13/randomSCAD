@@ -1,7 +1,9 @@
-layout=[3,4];
+//layout=[3,4];
 //layout=[2,3];
-//layout=[4,6];
+layout=[4,6];
 //layout=[2,1];
+//layout=[2,2];
+
 thickness=6;
 div_thickness=3;
 ct=thickness;
@@ -16,16 +18,16 @@ upright=true;
 handle_width=85;
 
 // champain bottle
-bottle_height=299;
-bottle_width=85;
+//bottle_height=299;
+//bottle_width=85;
 
 // 750ml bottle
 //bottle_height=291;
 //bottle_width=80;
 
 // 12oz normal
-//bottle_height=196;
-//bottle_width=65.5;
+bottle_height=196;
+bottle_width=65.5;
 
 // 12oz tall
 //bottle_height=226;
@@ -45,23 +47,21 @@ end_length=layout[0]*bottle_width+
 
 //%cube([300, 600, 6]);
 //bottles();
-//case();
-//lid_end();
-//bottles24();
 //end();
+%outside();
+label();
 //outside();
 //divider();
+//inside();
 //lid();
-//lid_end();
 //champagne_layout();
-//lid();
+//lid_end();
+//lid_side();
 //end();
 //model();
-bottom();
+//bottom();
+//case();
 
-//use<East Border.ttf>
-//linear_extrude(height = 5)
-//text("MPS BREW", size=50, font="East Border");
 
 module champagne_layout(){
 bottle_height=299;
@@ -72,7 +72,7 @@ bottle_width=85;
 }
 
 module model(){
-//  translate([0,0,bottle_height+thickness]) rotate([0,180,0]) lid();
+//  translate([end_length-thickness,0,bottle_height]) rotate([0,180,0]) lid();
   case();
   lid();
 }
@@ -80,42 +80,49 @@ module model(){
 module lid(){
   translate([end_length/2-thickness/2,side_length/2-thickness/2,0]){
     bottom();
-//    for(X=[-1,1]) 
-//        translate([(end_length+lid_thickness)/2*X,0,(lid_height-thickness)/2]) 
-//            rotate([0,90,0]) lid_side();
-//    for(Y=[-1,1])
-//        translate([0,(side_length+lid_thickness)/2*Y,(lid_height-thickness)/2]) 
-//            rotate([-90,0,0]) lid_end();
+    for(X=[-1,1]) 
+        translate([(end_length+lid_thickness)/2*X,0,(lid_height)/2-thickness]) 
+            rotate([0,90,0]) lid_side();
+    for(Y=[-1,1])
+        translate([0,(side_length+lid_thickness)/2*Y,(lid_height)/2-thickness]) 
+            rotate([-90,0,0]) lid_end();
   }
 }
 
 module lid_end(){
-    tabs=4;
-    union(){
-      translate([0,-thickness/2,0])
-    cube([end_length, lid_height-lid_thickness,lid_thickness], center=true);
+    cube([end_length, lid_height-thickness,lid_thickness], center=true);
 
-    for(X=[0:1:tabs])
-      translate([X*(end_length/(tabs*2)), (lid_height-thickness)/2,0]) 
-        cube([end_length/(tabs*2), ct, lid_thickness], center=true);
+    end_tabs = floor(floor(end_length/ch)/2);
+    if(ch*end_tabs+ch/2 > end_length/2){
+        end_tabs = end_tabs-1;
+        for(X=[-end_tabs:2:end_tabs])
+          translate([ch*X, lid_height/2,0]) 
+            cube([ch, thickness, lid_thickness], center=true);
+        }
+    else{
+        for(X=[-end_tabs:2:end_tabs])
+          translate([ch*X, lid_height/2,0]) 
+            cube([ch, thickness, lid_thickness], center=true);
+    }
+    echo(end_tabs);
     for(X=[-1,1])
       translate([(end_length+lid_thickness)/2*X,0,0])
-        cube([ct, lid_height/2, lid_thickness], center=true);
-    }
+        cube([lid_thickness, lid_height/2, lid_thickness], center=true);
 }
 
 module lid_side(){
   difference(){
     union(){
-      translate([-thickness/2,0,0])
-      cube([lid_height-thickness,side_length,lid_thickness], center=true);
-//    for(Y=[-1.5,0,1.5])
-//      translate([(lid_height-thickness)/2, bottle_width*Y, 0])
-//        cube([ct, bottle_width/2, thickness], center=true);
+      cube([lid_height-thickness,side_length+lid_thickness*2,lid_thickness], center=true);
+      
+      side_tabs = floor(floor(side_length/ch-1)/2);
+      for(Y=[-side_tabs:2:side_tabs])
+        translate([lid_height/2,Y*ch,0]) 
+            cube([thickness, ch, lid_thickness], center=true);
     }
-//    for(Y=[-1,1])
-//      translate([0,(bottle_width*2+thickness*3)*Y,0])
-//        cube([lid_height/2, ct, thickness+2], center=true);
+    for(Y=[-1,1])
+      translate([0,(side_length+lid_thickness)/2*Y,0])
+        cube([lid_height/2, lid_thickness, lid_thickness], center=true);
   }
 }
 
@@ -125,15 +132,22 @@ module bottom(){
   difference(){
     cube([end_length+lid_thickness*2, side_length+lid_thickness*2, thickness], center=true);
     end_tabs = floor(floor(end_length/ch)/2);
-    for(Y=[-1,1], X=[-end_tabs:2:end_tabs])
-      translate([ch*X, (side_length+lid_thickness)/2*Y,0]) 
-        cube([ch, lid_thickness, thickness+2], center=true);
-    echo(side_length/ch);
+    if(ch*end_tabs+ch/2 > end_length/2){
+        end_tabs=end_tabs-1;
+        for(Y=[-1,1], X=[-end_tabs:2:end_tabs])
+          translate([ch*X, (side_length+lid_thickness)/2*Y,0]) 
+            cube([ch, lid_thickness, thickness+2], center=true);
+    }
+    else{
+        for(Y=[-1,1], X=[-end_tabs:2:end_tabs])
+          translate([ch*X, (side_length+lid_thickness)/2*Y,0]) 
+            cube([ch, lid_thickness, thickness+2], center=true);
+    }
     
     side_tabs = floor(floor(side_length/ch-1)/2);
     for(X=[-1,1], Y=[-side_tabs:2:side_tabs])
       translate([(end_length+lid_thickness)/2*X,Y*ch,0]) 
-        %cube([lid_thickness, ch, thickness+2], center=true);
+        cube([lid_thickness, ch, thickness+2], center=true);
   }
 }
 
@@ -164,6 +178,13 @@ module outside(){
       translate([0, -div_thickness/2+thickness+(bottle_width+div_thickness)*Y,Z]) 
         cube([thickness+2, div_thickness, ch], center=true);
   }
+}
+
+module label(){
+//    linear_extrude(height = 5)
+    translate([0,30,bottle_height/2])
+    rotate([90,0,90])
+    text("MPS BREW", size=75, font="East Border");
 }
 
 module inside(){
@@ -213,15 +234,9 @@ module divider(){
   }
 }
 
-module bottles24(){
+module bottles(){
   for(X=[0:1:layout[0]-1], Y=[0:1:layout[1]-1]) 
     translate([((bottle_width+thickness)/2)+(bottle_width+div_thickness)*X,(bottle_width+thickness)/2+(bottle_width+div_thickness)*Y,0]) 
-      %bottle();
-}
-
-module bottles(){
-  for(X=[-1,0,1], Y=[-1.5,-0.5,0.5,1.5]) 
-    translate([(bottle_width+thickness)*X,(bottle_width+thickness)*Y,0]) 
       %bottle();
 }
 
