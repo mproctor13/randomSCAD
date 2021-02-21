@@ -67,7 +67,7 @@ module top_enclosure(){
     
 }
 
-module door_camera_mount(down_tilt=10, height=0){
+module door_camera_mount(down_tilt=40, height=0){
     difference(){
         union(){
             hull(){
