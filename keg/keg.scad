@@ -16,6 +16,16 @@ top();
 //  PiGPIO(1);
 //}
 
+//screen_hole_test();
+
+module screen_hole_test(){
+  difference(){
+    cylinder(d=68,h=3);
+    cylinder(d=66,h=2);
+    translate([-2,0,0]) cube([27,27,10], center=true);
+  }
+}
+
 module top(){
   intersection(){
     model();
@@ -85,7 +95,7 @@ module inside(){
 module model(){
   difference(){
     body();
-    translate([0,0,91.5]) cube([30,30,15], center=true);
+    translate([-2,0,91.5]) cube([27,27,15], center=true);
     translate([0,0,10]) cylinder(d=66,h=77);
     translate([0,0,2]) cylinder(d1=42,d2=66,h=10);
     difference(){
