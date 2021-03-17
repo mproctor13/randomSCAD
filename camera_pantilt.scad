@@ -11,8 +11,8 @@ main_diameter=10;
 
 //translate([0,0,1.5]) mag_mount();
 //as_inner_test();
-//%as_outer_test();
-test_foot();
+as_outer_test();
+//test_foot();
 
 //difference(){
 //as5600_mount();0
@@ -56,8 +56,11 @@ module test_foot(){
 
 module as_inner_test(){
   difference(){
-    inside_race(diameter=main_diameter, holes=0, offset=-1.5, ball_dia=ball_dia,
-                    race_width=race_width+3, race_height=race_height);  
+    inside_race(diameter=main_diameter, 
+                holes=0, offset=-1.5, 
+                ball_dia=ball_dia,
+                race_width=race_width+3, 
+                race_height=race_height);  
     cylinder(d=15, h=4, $fn=8);
     cylinder(d=12, h=20, $fn=60);
   }
@@ -67,9 +70,11 @@ module as_outer_test(){
   intersection(){
     difference(){
       union(){
-        outside_race(diameter=main_diameter, holes=0, offset=1.5, 
-                        ball_dia=ball_dia, race_width=race_width, 
-                        race_height=race_height);
+        outside_race(diameter=main_diameter, 
+                        holes=0, offset=3, 
+                        ball_dia=ball_dia, 
+                        race_width=race_width, 
+                        race_height=11);
 //        translate([0,0,-1]) cylinder(d=25, h=1, center=true, $fn=12);
 //        for(X=[-1,1]) translate([6*X,0,-1.5]) cylinder(d=2,h=2, $fn=60);
       }
