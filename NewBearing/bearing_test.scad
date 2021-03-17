@@ -15,8 +15,9 @@ hole_diameter=3;
 //  }
 //  cube(100);
 //}
-module inside_race(diameter=main_diameter, holes=holes, 
-                    offset=-0.5, race_spacing=race_spacing){
+module inside_race(diameter=main_diameter, holes=holes, ball_dia=ball_dia,
+                    offset=-0.5, race_spacing=race_spacing, 
+                    race_width=race_width, race_height=race_height){
   translate([0,0,-offset])
   difference(){
   rotate_extrude()
@@ -26,9 +27,9 @@ module inside_race(diameter=main_diameter, holes=holes,
         translate([race_width-race_spacing,race_height/2+offset,0]) 
           circle(d=ball_dia+bextra);
       }
-    translate([-race_spacing,diameter,race_height/2+offset]){
+    translate([0,diameter,race_height/2+offset]){
       cylinder(d=ball_dia+bextra, h=race_height/2+abs(offset));
-      cylinder(d=4, h=race_height+2, center=true);
+      cylinder(d=ball_dia/2, h=race_height+2, center=true);
     }
     if(holes > 0)
       for(R=[0:360/holes:360]) rotate([0,0,R])
@@ -37,8 +38,9 @@ module inside_race(diameter=main_diameter, holes=holes,
   }
 }
 
-module outside_race(diameter=main_diameter, holes=holes, 
-                    offset=+0.5, race_spacing=race_spacing){
+module outside_race(diameter=main_diameter, holes=holes, ball_dia=ball_dia,
+                    offset=+0.5, race_spacing=race_spacing, 
+                    race_width=race_width, race_height=race_height){
   translate([0,0,-offset])
   difference(){
     rotate_extrude()
@@ -48,9 +50,9 @@ module outside_race(diameter=main_diameter, holes=holes,
           translate([-race_spacing,race_height/2+offset,0]) 
             circle(d=ball_dia+bextra);
         }
-      translate([0,diameter+race_spacing,race_height/2+abs(offset)]){
+      translate([0,diameter,race_height/2+abs(offset)]){
         cylinder(d=ball_dia+bextra, h=race_height/2+offset);
-        cylinder(d=4, h=race_height+2, center=true);
+        cylinder(d=ball_dia/2, h=race_height*2, center=true);
       }
       if(holes > 0)
         for(R=[0:360/holes:360]) rotate([0,0,R])
