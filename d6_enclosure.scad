@@ -5,6 +5,7 @@ side_spacing=248;
 panel_height=284;
 panel_width=256;
 thickness=3.5;
+include <fhex.scad>
 
 //handle();
 //door();
@@ -366,19 +367,4 @@ module hinge(hole_center=25, height=30, offset=0, nut=true){
             rotate([0,90,0])
             cylinder(d=11, h=(height/2)+diameter);
     }
-}
-
-m3_hex_nut=5.6;
-m3_nut_height=2.25;
-m4_hex_nut=7.2;
-m4_nut_height=2.9;
-m5_hex_nut=7.8;
-m5_nut_height=3.9;
-
-module fhex(wid,height){
-  hull(){
-    cube([wid/1.7,wid,height],center=true);
-    rotate([0,0,120]) cube([wid/1.7,wid,height], center=true);
-    rotate([0,0,240]) cube([wid/1.7,wid,height], center=true);
-  }
 }
