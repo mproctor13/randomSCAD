@@ -29,9 +29,10 @@ thickness=3.5;
 
 //translate([-141,11,0]) import("../printer/camera-mount.stl");
 
-translate([107.5,60+35,-5]) rotate([0,90,0]) door_camera_mount(height=35);
-//top_enclosure();
+//translate([107.5,60+35,-5]) rotate([0,90,0]) door_camera_mount(height=35);
+top_enclosure();
 //test_template2();
+//door();
     
 module export_door(){
     projection(cut = true) rotate([0,0,0]) door();
@@ -41,14 +42,14 @@ module door(){
     difference(){
         translate([120,0,0]) 
         hull() for(X=[-1,1], Y=[-1,1]){
-            translate([((265/2)-2.5)*X,((295/2)-2.5)*Y,0]) cylinder(d=5, h=thickness);
+            translate([((265/2)-2.5)*X,((305/2)-2.5)*Y,0]) cylinder(d=5, h=thickness);
         }
         
         for(Y=[-92.5,-67.5,67.5,92.5]) translate([0, Y, 0])
             cylinder(d=4.2+fudge, h=10, center=true); 
         for(X=[224,233]) translate([X, 0, 0])
             cylinder(d=4.2+fudge, h=10, center=true);
-        translate([120,45,0])
+        for(Y=[65, 45]) %translate([120,Y,0])
             for(X=[-1,1]) translate([7*X,0,-1]) 
                 cylinder(d=3.8, h=thickness+2);
     }
@@ -58,13 +59,67 @@ module export_side_panel(){
     projection(cut = true) rotate([90,0,0]) side_panel();
 }
 
-module top_enclosure(){
-    width=294;
-    depth=294;
-    height=152;
-    translate([0,0,height/2]) 
-        %cube([width, depth, height], center=true);
-    
+
+
+module top_enclosure(sthickness=3){
+    width=300;
+    depth=300;
+    height=145;
+//    translate([0,0,height/2]) 
+//        %cube([width, depth, height], center=true);
+  translate([0,0,145-sthickness/2])
+    enclosure_top(width, depth, sthickness);
+  for(X=[-1,1]) translate([((width/2)-sthickness/2)*X,0,0])
+    enclosure_side(height, depth, sthickness);
+  translate([0,-depth/2+sthickness/2,height/2-sthickness/2])
+    enclosure_front();
+  translate([0,depth/2-sthickness/2,height/2-sthickness/2])
+    enclosure_back();
+}
+
+module enclosure_top(width=300, depth=300, sthickness=3){
+  difference(){
+    cube([width,depth,sthickness], center=true);
+    for(X=[-1,1], Y=[-1,1])
+      translate([X*75, Y*(150-sthickness/2), -1])
+        cube([30,sthickness,sthickness+2], center=true);
+    for(X=[-1,1], Y=[-1,1])
+      translate([X*(150-sthickness/2), Y*75, -1])
+        cube([sthickness,30,sthickness+2], center=true);
+  }
+}
+
+module enclosure_side(height=145, depth=300, sthickness=3){
+    // 190 length minus 110 
+    translate([0,0,height/2-sthickness/2])
+      difference(){
+        cube([sthickness, depth, height-sthickness], center=true);
+        for(Y=[-1,1]) translate([0,(depth/2-sthickness/2)*Y,0])
+          cube([sthickness, sthickness, 30], center=true);
+      }
+    for(Y=[-1,1]) translate([0,Y*75,height-sthickness/2]) 
+      cube([sthickness, 30, sthickness], center=true);
+    translate([0,0,-sthickness/2])
+      difference(){
+        cube([sthickness, 190, sthickness], center=true);
+        cube([sthickness, 110, sthickness], center=true);
+      }
+}
+
+module enclosure_front(height=145, width=300, sthickness=3){
+    translate([0,0,0])
+      cube([width-sthickness*2, sthickness, height-sthickness], center=true);
+    for(X=[-1,1]) translate([X*75,0,height/2]) 
+      cube([30, sthickness, sthickness], center=true);
+    for(X=[-1,1]) translate([X*(width/2-sthickness/2),0,0]) 
+      cube([sthickness, sthickness, 30], center=true);
+}
+
+module enclosure_back(height=145, width=300, sthickness=3){
+  difference(){
+    enclosure_front(height, width, sthickness);
+    translate([-80,0,30]) cube([80,10,30], center=true);
+  }
 }
 
 module door_camera_mount(down_tilt=40, height=0){
