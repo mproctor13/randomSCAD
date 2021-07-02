@@ -1,4 +1,4 @@
-$fn=60;
+//$fn=60;
 sfn=30;
 fudge=0.3;
 side_spacing=248;
@@ -31,7 +31,7 @@ include <fhex.scad>
 //translate([-141,11,0]) import("../printer/camera-mount.stl");
 
 //translate([107.5,60+35,-5]) rotate([0,90,0]) door_camera_mount(height=35);
-top_enclosure();
+//top_enclosure();
 //test_template2();
 //door();
     
