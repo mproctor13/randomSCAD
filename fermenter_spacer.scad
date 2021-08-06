@@ -4,6 +4,7 @@ $fn=120;
 //air_lock_holder();
 adapter();
 
+
 module spacer(){
     difference(){
         cylinder(d=55, h=25, center=true);
@@ -30,7 +31,7 @@ module air_lock_holder(){
     }
 }
 
-module adapter(length=8){
+module adapter(length=10){
   
   difference(){
     union(){

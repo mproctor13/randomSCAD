@@ -41,12 +41,12 @@ module presure_mount(offset_len=-75,mount_width=50,mount_thickness=5){
                 cylinder(d=5,h=mount_thickness, center=true, $fn=60);
         } 
     }
-      translate([mount_thickness+offset_len+7,0,0])
+      translate([mount_thickness+offset_len-4.5,0,0])
       hull(){
         translate([0,0,4.5]) 
           for(Y=[-1,1]) translate([0,(mount_width/2-5)*Y,0]) 
               cylinder(d=6,h=0.1,center=true,$fn=60);
-        translate([0,0,-12]) 
+        translate([0,0,-16]) 
           for(Y=[-1,1]) translate([0,(mount_width/2+5)*Y,0]) 
               sphere(d=6,$fn=60);
       }
