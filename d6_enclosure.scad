@@ -1,10 +1,14 @@
 $fn=60;
-sfn=30;
+sfn=60;
 fudge=0.3;
 side_spacing=248;
 panel_height=284;
 panel_width=256;
 thickness=3.5;
+
+enclosure_width=300;
+enclosure_depth=300;
+enclosure_height=145;
 include <fhex.scad>
 
 //handle();
@@ -19,24 +23,59 @@ include <fhex.scad>
 //    mirror([0,1-Z,0]) side_panel_support();
 //for(X=[-1,1]) 
 //translate([side_spacing/2*X,0,0]) mirror([1-X,0,0])
-//    vertical_side_panel_support();
+//    vertical_side_panel_support(part=1);
 //translate([-234/2,-180,0])
 //rotate([90,0,0])
 //door_assembly();
-//for(X=[-1,1])
-//translate([175*X,0,0])
-//rotate([0,0,90*X]) side_assembly();
+//for(X=[-1,1])  translate([175*X,0,0]) rotate([0,0,90*X]) 
+//  side_assembly();
 //for(X=[-1,1]) translate([124*X,0,0]) rotate([90,90,0]) vert_test(width=294);
 
 //translate([-141,11,0]) import("../printer/camera-mount.stl");
 
 //translate([107.5,60+35,-5]) rotate([0,90,0]) door_camera_mount(height=35);
-top_enclosure();
+//top_enclosure();
 //test_template2();
 //door();
-    
+
+//side_panel_support();
+
+//translate([0,0,-15]) inside_panel_support();
+//side_panel();
+
+
+// Export
+%cube([12*25.5,12*25.5,3], center=true);
+//export_door(); //  x2
+//export_side_panel(); //  x2
+//export_top(); //  x2
+//export_side(); // x2
+export_front(); //  x2
+
 module export_door(){
-    projection(cut = true) rotate([0,0,0]) door();
+    projection(cut = true) translate([-120,0,0]) door();
+}
+
+module export_side_panel(){
+    projection(cut = true) rotate([90,0,0]) side_panel();
+}
+
+module export_top(){
+    projection(cut = true) translate([0,0,0]) enclosure_top();
+}
+
+module export_side(){
+    projection(cut = true) translate([5,0,0]) 
+        rotate([0,90,0]) enclosure_side();
+    projection(cut = true) translate([-145,0,0]) 
+        rotate([0,90,0]) enclosure_side();
+}
+
+module export_front(){
+    projection(cut = true) translate([0,72.5,0]) 
+        rotate([90,0,0]) enclosure_front();
+    projection(cut = true) translate([0,-75,0]) 
+        rotate([90,0,0]) enclosure_back();
 }
 
 module door(){
@@ -56,20 +95,11 @@ module door(){
     }
 }
 
-module export_side_panel(){
-    projection(cut = true) rotate([90,0,0]) side_panel();
-}
-
-
-
 module top_enclosure(sthickness=3){
-    width=300;
-    depth=300;
-    height=145;
 //    translate([0,0,height/2]) 
 //        %cube([width, depth, height], center=true);
   translate([0,0,145-sthickness/2])
-    enclosure_top(width, depth, sthickness);
+    enclosure_top();
   for(X=[-1,1]) translate([((width/2)-sthickness/2)*X,0,0])
     enclosure_side(height, depth, sthickness);
   translate([0,-depth/2+sthickness/2,height/2-sthickness/2])
@@ -226,30 +256,75 @@ module side_panel_test(spacing=side_spacing){
     }
 }
 
-module vertical_side_panel_support(dia=20, sep=290){
+module vertical_side_panel_support(part=0,dia=20, sep=290){
+    if(part==1){
+        difference(){
+            vertical_side_panel_support_int(dia,sep);
+            translate([0,1.26,0]) cube([dia, 10, sep+dia], center=true);
+        }
+    }
+    else if(part==2){
+        intersection(){
+            vertical_side_panel_support_int(dia,sep);
+            translate([0,1.26,0]) cube([dia, 10, sep+dia], center=true);
+        }
+    }
+    else{
+        vertical_side_panel_support_int(dia,sep);
+    }
+}
+
+module vertical_side_panel_support_int(dia=20, sep=290, thickness=3){
     difference(){
-        hull()
+        union(){
+          hull()
             for(Z=[-1,1]) translate([0,0,sep/2*Z]) 
                 sphere(d=dia, $fn=sfn);
-        translate([0,dia/2,0])
+            vert_handle();
+//            translate([0,-3.5,0]) rotate([0,90,-90]) side_handle(sides=false);
+        }
+        translate([0,dia/2+thickness,0])
             cube([dia, dia, sep+dia], center=true);
-        translate([-(dia/2)+4.5,-thickness+fudge*4,0])
-            cube([dia, thickness+fudge*3, sep+dia], center=true);
+        translate([-(dia)+4.5,-thickness+fudge*4,0])
+            cube([dia*2, thickness+fudge*3, sep+dia], center=true);
         for(Z=[-1,1]){
-            translate([dia,-1,sep/2*Z]) rotate([0,-90,0])
-                cylinder(d=dia, h=dia*2);
+            translate([dia,-1,sep/2*Z]) hull(){
+                rotate([0,-90,0]) cylinder(d=dia, h=dia*2);
+                translate([-dia,dia,0]) cube([dia*2,dia,dia],center=true);
+            }
+            
         }
         for(Z=[-1,0,1]){
             translate([-1,0,(panel_height/2-20)*Z])
                 rotate([90,0,0]) {
                 cylinder(d=3.2+fudge, h=40, center=true);
-                translate([0,0,11]) fhex(m3_hex_nut+fudge,10);
+                translate([0,0,16]) fhex(m3_hex_nut+fudge,20);
+                translate([0,0,-3.1]) cylinder(d1=6,d2=3,h=3);
             }
         }
     }
 }
 
+
+module vert_handle(width=50){
+    translate([-5,0,0]) 
+    difference(){
+        intersection(){
+            hull()
+                for(Z=[-1,1]) translate([0,0,((width/2-15))*Z]) 
+                    sphere(d=30, $fn=sfn);
+            translate([0,-20,0]) cube([40,40,100], center=true);
+        }
+        translate([-14.25,-5,0]) cylinder(d=20,h=width+2,center=true);
+    }
+}
+
 module top_side_support(){
+    side_handle();
+    side_panel_support(dia=20);
+}
+
+module side_handle(){
     hull() for(X=[-1,1], Y=[-20,-30]) 
         translate([-50*X,Y,20]) sphere(d=5, $fn=sfn);
     for(X=[-1,1]) translate([-50*X,0,0]) hull(){
@@ -264,7 +339,6 @@ module top_side_support(){
     }
     hull() for(X=[-1,1], Z=[2.5,20]) 
         translate([-50*X,-30,Z]) sphere(d=5, $fn=sfn);
-    side_panel_support(dia=20);
     
 }
 
@@ -282,6 +356,20 @@ module side_panel_support(dia=20){
                 cylinder(d=5+fudge, h=dia);
             translate([side_spacing/2*X,0,dia/4])
                 cylinder(d=dia, h=dia);
+        }
+    }
+}
+
+module inside_panel_support(dia=20, thickness=3){
+    difference(){
+        hull()
+            for(X=[-1,1]) translate([side_spacing/2*X,0,0]) 
+                cylinder(d=dia, h=thickness, $fn=sfn);
+        translate([0,0,-dia/2])
+            cube([side_spacing+dia, dia, dia], center=true);
+        for(X=[-1,1]){
+            translate([side_spacing/2*X,0,-0.5])
+                cylinder(d=5+fudge, h=dia);
         }
     }
 }
