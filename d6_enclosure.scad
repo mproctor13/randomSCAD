@@ -47,7 +47,7 @@ include <fhex.scad>
 // Export
 %cube([12*25.5,12*25.5,3], center=true);
 //export_door(); //  x2
-//export_side_panel(); //  x2
+//export_side_panel(); //  x4
 //export_top(); //  x2
 //export_side(); // x2
 export_front(); //  x2
