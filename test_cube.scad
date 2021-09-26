@@ -1,6 +1,6 @@
 
-//test_cube();
-level_check();
+test_cube();
+//level_check();
 
 module level_check(){
     difference(){
@@ -10,7 +10,7 @@ module level_check(){
     }
 }
 
-module test_cube(size=30, h=10, wall=1){
+module test_cube(size=30, h=5, wall=1){
     translate([-size/2, -size/2, 0])
     difference(){
         cube([size, size, h]);
