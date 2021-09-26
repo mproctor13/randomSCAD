@@ -2,16 +2,28 @@
 
 include <fhex.scad>
 use <shoe_tree.scad>
-$fn=60;
+use <RPi4board-modded.scad>
+//$fn=60;
+//$fn=360;
+$fn = $preview ? 60 : 360;
+pi_holes=[29,24.5];
 pipe_dia=49; // 1.5" abs
 pipe_width=225;
 
+//model();
+handle();
+//open_end();
+//io_end();
 //end_cap();
+//handle();
 //monitor_mount();
 //ups_tie();
-//model();
-switch_mount(type=2);
+//switch_mount(type=2);
+
+//translate([0,0,50]) monitor_mount();
 //pi_mount();
+//open_end();
+//cased_pi4();
 
 module model(){
   %pipes(height=750);
@@ -36,35 +48,91 @@ module model(){
       translate([0,0,44+110]) rotate([180,0,180]) monitor_mount();
     }
   }
+  translate([0,0,554]) pi_mount();
   translate([pipe_width/2,0,250]) switch_mount();
   
   for(X=[-1,1]) 
     translate([pipe_width/2*X, 0, 732]) rotate([0,0,90*X]) end_cap();
   translate([0, 0, 752]) rotate([0,90,0]) rotate([0,0,90]) 
-    rotate([0,0,90]) handle(width=pipe_width-pipe_dia-20);
+    rotate([0,0,90]) handle();
 
   control_base();
 }
 
 module pi_mount(height=75){
-  %for(Z=[-1,1]) translate([0,0,(height/2+2.5)*Z]) pi_arm();
-   for(X=[-1,1]) translate([pipe_width/2*X, 0, 0]) 
-     rotate([0,0,90]) rotate([0,0,90*X]) pi_seperator(height=height);
+  
+  for(Z=[-1,1]) translate([0,0,(height/2+2.5)*Z]) 
+    pi_arm(type=Z);
+  for(X=[-1,1]) translate([pipe_width/2*X, 0, 0]) 
+    rotate([0,0,90]) rotate([0,0,90*X]) 
+      pi_seperator(height=height);
+  translate([60,0,0]){
+    translate([6,-14.5,28]) rotate([-90,90,0]) cased_pi4();
+    translate([5,0,0]) open_end(height=height+4);
+    translate([-pi_holes[0]*2,0,0])
+      io_end(height=height+4);
+  }
 }
 
-module pi_arm(thickness=5){
+module cased_pi4(){
+  board_raspberrypi_4_model_b();
+  %translate([-3,0,-7]) cube([63,85,16.3]);
+    
+//  translate([28,32.5,10]) 
+//    for(X=[-1,1], Y=[-1,1]) 
+//      translate([pi_holes[1]*Y,pi_holes[0]*X,0])
+//        cylinder(d=3.3, h=40, center=true);
+    
+}
+
+module pi_arm(type=-1){
+  if(type == -1){
+    difference(){
+      rotate([0,180,0]) pi_arm_internal();
+      translate([35,-10,0]) hull() for(X=[-1,1], Y=[-1,1])
+        translate([25*X, 2.5*Y, 0]) 
+          cylinder(d=5,h=10,center=true);
+      for(X=[2,65]) translate([X,0,0]){
+        translate([0,0,3]) 
+          cube([10.2,10.2,4],center=true);
+        cylinder(d=3.3,h=15,center=true);
+      }
+    }
+  }
+  else if(type == 1){
+    difference(){
+      pi_arm_internal();
+      for(X=[2,65]) translate([X,0,0]){
+        translate([0,0,-3]) 
+          cube([10.2,10.2,4],center=true);
+        cylinder(d=3.3,h=15,center=true);
+      }
+      hull() translate([0,-pipe_dia/2+5.9-1-5,0]) 
+        for(X=[-1,1], Y=[-1,1])
+          translate([(173-2-15)/2*X,(24-2)/2*Y,0]) 
+            cylinder(d=2,h=6, center=true);
+    }
+  }
+
+}
+
+module pi_arm_internal(thickness=5){
   difference(){
       hull() for(X=[-1,1]) 
-          translate([pipe_width/2*X, 0, 0]) 
-            cylinder(d=pipe_dia+10, h=thickness, center=true);
+        translate([pipe_width/2*X, 0, 0]) 
+          cylinder(d=pipe_dia+10, h=thickness, center=true);
     for(X=[-1,1])
       translate([pipe_width/2*X, 0, 0]) 
         cylinder(d=pipe_dia, h=thickness+1, center=true);
     for(X=[-1,1], Y=[-1,1])
       translate([(pipe_width-pipe_dia)/2*X, (pipe_dia/2)*Y, 0]){
         cylinder(d=3.3, h=thickness+1, center=true);
-        translate([0,0,1.5]) cylinder(d=8, h=thickness-3, center=true);
+//        translate([0,0,1.5]) 
+//          cylinder(d=8, h=thickness-3, center=true);
       }
+      translate([0,16,0]) hull() for(X=[-1,1], Y=[-1,1])
+        translate([25*X, 5*Y, 0]) 
+          cylinder(d=10,h=thickness+1,center=true);
   }
 }
 
@@ -80,19 +148,64 @@ module pi_seperator(height=75){
       translate([pipe_dia/2, (pipe_dia/2)*Y, (height/2-4.2)*Z]){
         cylinder(d=3.3, h=32, center=true);
         hull() for(X=[7,-1]) {
-          translate([X,0,0]) fhex(wid=m3_hex_nut+0.2,height=m3_nut_height+0.2);
+          translate([X,0,0])
+            fhex(wid=m3_hex_nut+0.2,height=m3_nut_height+0.2);
+          translate([0,0,0]) cylinder(d=5,h=0.3,center=true);
         }
       }
+    hull() for(Z=[-1,1], Y=[-1,1])
+      translate([0,10*Y,15*Z]) rotate([0,90,0]) 
+        cylinder(d=25, h=pipe_dia);
     rotate([90,0,0]) cylinder(d=5, h=pipe_dia+12, center=true);
     rotate([0,-90,0]) cylinder(d=5, h=pipe_dia);
   }
+  for(Z=[-1,1], Y=[-1,1])
+      translate([pipe_dia/2, (pipe_dia/2)*Y, (height/2-4.2)*Z+(m3_nut_height+0.2)/2+0.15]) cylinder(d=5,h=0.3,center=true);
 }
 
-module closed_end(){ // 63x20x5
-   
+module io_end(height=79){ // 63x20x5
+  difference(){
+    union(){
+      cube([10,10,height], center=true);
+      for(Z=[-1,1]) 
+        translate([2.5,-5,pi_holes[1]*Z]) rotate([90,0,0])
+          cylinder(d=5,h=3,center=true);
+    }
+    translate([-2.5,-2.5,0])
+      cube([5.1,7.1,height-20], center=true);
+    for(Z=[-1,1]){
+      translate([2.5,0,pi_holes[1]*Z]) rotate([90,0,0])
+        cylinder(d=3,h=100,center=true);
+      translate([0,7,12*Z]) 
+        rotate([0,90,0]) 
+          ziptie_channel(width=2,depth=0,radius=5);
+      translate([0,0,33*Z])
+        cube([m3_hex_nut,15,m3_nut_height],center=true);
+      translate([0,0,35*Z])
+        cylinder(d=3.3,h=10,center=true);
+    }
+  }
 }
-module open_end(){ // 63x24x8
-   
+module open_end(height=79){ // 63x24x8
+  difference(){
+    union(){
+      cube([10,10,height], center=true);
+      for(Z=[-1,1]) 
+        translate([-2.5,-5,pi_holes[1]*Z]) rotate([90,0,0])
+          cylinder(d=5,h=3,center=true);
+    }
+    for(Z=[-1,1]){
+      translate([-2.5,0,pi_holes[1]*Z]) rotate([90,0,0])
+        cylinder(d=3,h=100,center=true);
+      translate([0,7,12*Z]) 
+        rotate([0,90,0]) 
+          ziptie_channel(width=2,depth=0,radius=5);
+      translate([0,0,33*Z])
+        cube([m3_hex_nut,15,m3_nut_height],center=true);
+      translate([0,0,35*Z])
+        cylinder(d=3.3,h=10,center=true);
+    }
+  }
 }
 
 module antenna_mount_lid(){
@@ -124,7 +237,7 @@ module antenna_mount(height=15){
   }
 }
 
-module handle(width=130){
+module handle(width=pipe_width-pipe_dia-20){
   translate([0,0,-width/2]) handle_end();
   cylinder(d=20, h=width, center=true);
   translate([0,0,width/2]) rotate([0,180,0]) handle_end();
@@ -241,23 +354,15 @@ module switch_hole(length=20){
 }
 
 module end_cap(){
-// %cylinder(d=57, h=150);
-//  difference(){
-//    translate([0,0,-1]) cylinder(d=pipe_dia, h=20);
-//  }
   difference(){
     union(){
-//        translate([40+pipe_dia/2,0,31.5]) rotate([0,90,0]) 
-//          cylinder(d=63, h=80,center=true);
-//      cylinder(d=pipe_dia+10, h=20+pipe_dia/2);
-    hull(){
-//      translate([0,0,pipe_dia]) sphere(d=pipe_dia+10);
-      cylinder(d=pipe_dia+10, h=57);
-      cylinder(d=pipe_dia+10, h=20);
+      translate([0,0,47]) cylinder(d1=pipe_dia+9, d2=63, h=10);
+      hull(){
+        cylinder(d=pipe_dia+10, h=57);
       
-      for(Z=[10,30]) translate([0,pipe_dia/2,Z]) 
+        for(Z=[10,30]) translate([0,pipe_dia/2,Z]) 
           rotate([0,90,90]) cylinder(d=20, h=10);
-    }
+      }
     }
     translate([0,pipe_dia/2+4,53.1]) cylinder(d=4.5,h=4);
     for(Z=[-1,1]) translate([0,pipe_dia/2-5,20+(15*Z)]) 
@@ -271,7 +376,6 @@ module end_cap(){
       
     translate([0,0,45]) cylinder(d=57, h=50);
     translate([0,0,-1]) cylinder(d=25, h=100);
-//    %translate([0,0,45]) cylinder(d=57, h=12);
     translate([0,0,0]) cylinder(d=45, h=40);
     translate([0,0,-1]) cylinder(d=pipe_dia, h=21);
   }
@@ -409,12 +513,12 @@ module control_base_internal(mount_hole=5){
   }
 }
 
-module filler(width=100){
-  translate([width,0,0]) union(){
-    circle(d=15);
-    translate([-width/2,0,0]) square([width,15], center=true);
-  }
-}
+//module filler(width=100){
+//  translate([width,0,0]) union(){
+//    circle(d=15);
+//    translate([-width/2,0,0]) square([width,15], center=true);
+//  }
+//}
 
 module monitor(){
   cube([375, 8.5, 225], center=true);
