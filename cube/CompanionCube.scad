@@ -39,6 +39,48 @@ translate([0,0,65])
 //middle();
 //four_glasses();
 
+//platform();
+//linear_extrude(10, scale=1.5) 
+//heart(radius=10, center=true);
+//four_holder();
+//translate([0,0,150]) four_holder_lid();
+glass_color_code();
+
+module four_holder_lid(){
+  $fn=120;
+  difference(){
+    for(X=[-1,1], Y=[-1,1]) 
+      translate([35*X,35*Y,0]) 
+        cylinder(d=85,h=8);
+    for(X=[-1,1], Y=[-1,1]) 
+      translate([35*X,35*Y,-0.2]) 
+        cylinder(d=80.5,h=6);
+  }
+}
+
+module four_holder(){
+  $fn=120;
+  difference(){
+    for(X=[-1,1], Y=[-1,1]) 
+      translate([35*X,35*Y,0]) 
+        cylinder(d=80,h=110);
+    four_glasses(offset=35);
+  }
+}
+
+module glass_color_code(thickness=7.5){
+  $fn=120;
+  difference(){
+    union(){
+      cylinder(d=48,h=thickness);
+      rotate_extrude() translate([24,4,0]) circle(d=thickness);
+        
+      cylinder(d=24*2+thickness,h=thickness/2);
+    }
+    translate([0,0,thickness-5+0.2]) cylinder(d=47,h=5);
+  }
+}
+
 module companion_cube(type="middle"){
   difference(){
     union(){
@@ -212,10 +254,6 @@ module platform(height=5){ // Heart Platform
   color("red") linear_extrude(height*2) heart(radius=Size*ICF/12, center=true);
 }
 
-//platform();
-linear_extrude(10, scale=1.5) 
-heart(radius=10, center=true);
-
 module heart_sub_component(radius) {
     rotated_angle = 45;
     diameter = radius * 2;
@@ -240,9 +278,9 @@ module heart(radius, center = false) {
 
 }
 
-module four_glasses(){
+module four_glasses(offset=40){
   for(X=[-1,1], Y=[-1,1])
-    translate([40*X,40*Y,0])
+    translate([offset*X,offset*Y,0])
       glass_cutout();
 }
 

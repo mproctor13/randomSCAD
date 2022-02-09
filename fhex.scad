@@ -1,5 +1,7 @@
 
 
+m2_5_hex_nut=5; //4.94
+m2_5_nut_height=1.85;
 m3_hex_nut=5.6;
 m3_nut_height=2.25;
 m4_hex_nut=7.2;

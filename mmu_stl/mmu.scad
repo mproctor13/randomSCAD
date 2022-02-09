@@ -1,11 +1,201 @@
 
-$fn=60;
 sq_nutX=5.5;
 sq_nutY=2;
 offset=-31;
+
 //assembly(offset);
 //mmu();
-pinda_mount(offset);
+//pinda_mount(offset);
+//crtouch_mount();
+include <../threads.scad>
+
+include <../NewBearing/bearing_test.scad>
+
+
+$fn=120;
+nut();
+//difference(){
+//intersection(){
+//  spool_mount();
+//  translate([0,0,120]) cube([100,100,100], center=true);
+//}
+//  translate([0,0,100]) rotate([0,180,0]) nut();
+//  cube([50,50,100]);
+//}
+//metric_thread (diameter=40, pitch=5, length=20, angle=50);
+//translate([0,0,25 ]) metric_thread (diameter=40, pitch=4, length=20);
+
+//spool_internal();
+
+module nut(thread_dia=40,tangle=50){
+  difference(){
+    union(){
+      cylinder(d=70, h=5);
+      translate([0,0,5]) cylinder(d1=70, d2=thread_dia+2, h=20);
+    }
+    metric_thread(diameter=thread_dia+1, pitch=4, angle=tangle, length=50, square=false);
+  }
+}
+
+module spool_internal(thread_dia=40,length=75,tangle=50){
+  difference(){
+    union(){
+      translate([0,0,20]) cylinder(d=thread_dia-15,h=length+7);
+      translate([0,0,10]) cylinder(d1=46,d2=thread_dia-15,h=10);
+      translate([0,0,0]) cylinder(d=46,h=10);
+    }
+    translate([0,0,length+15]) cutout_race(diameter=13);
+    translate([0,0,10]) rotate([0,180,0]) cutout_race(diameter=23);
+    %translate([0,0,length/2-10]) cube([15,15,length], center=true);
+  }
+}
+
+module spool_mount(thread_dia=40,length=75,tangle=50){
+  difference(){
+    union(){
+      translate([0,0,25]) intersection(){
+        union(){
+          translate([0,0,length-5])
+            cylinder(d1=thread_dia, d2=thread_dia-5, h=10);
+          cylinder(d=thread_dia+5, h=length-5);
+        }
+        metric_thread(diameter=thread_dia, pitch=4, length=length, angle=tangle);
+      }
+      cylinder(d=70, h=5);
+      translate([0,0,5]) cylinder(d1=70, d2=thread_dia+2, h=20);
+    }
+    translate([0,0,-1]) cylinder(d=thread_dia-14,h=length+27);
+    translate([0,0,10]) cylinder(d=thread_dia-12,h=15+length-9);
+    translate([0,0,length+15]) cutout_race(diameter=13);
+    translate([0,0,10]) rotate([0,180,0]) cutout_race(diameter=23);
+  }
+}
+
+module crtouch_mount(x_offset=0, z_offset=-4){
+//%translate([12,-2,0]) rotate([90,0,180]) import("../../printer/address/WanhoaD6Bltouch.stl");
+    rotate([90,0,0]){
+    difference(){
+      union(){
+        hull(){
+            for(X=[-1,1]) translate([15*X,0,-1]) 
+                cylinder(d=6, h=3);
+            translate([x_offset,z_offset+5,0.5]) 
+              for(X=[-1,1]) translate([10*X,0,0]) 
+                cylinder(d=6,h=3,center=true);
+        }
+        translate([-14+x_offset,z_offset,0]) hull(){
+          translate([14,5,0.5]) for(X=[-1,1]) translate([11*X,0,0]) 
+            rotate([0,0,0]) cylinder(d=6,h=3,center=true);
+          translate([0,0,-1]) cube([28,3,3]);
+        }
+        translate([x_offset,0,0]) difference(){
+          hull(){
+            translate([-14,z_offset,0]) cube([28,3,2]);
+            translate([0,z_offset+1.5,-9.5]) {
+              for(X=[-1,1]) translate([11*X,0,0]) 
+                rotate([90,0,0]) cylinder(d=6,h=3,center=true);
+              cube([10,3,10], center=true);
+            }
+          }
+          translate([0,z_offset,-4.5])
+            cube([14,10,4],center=true);
+          translate([0,z_offset,-3])
+            for(X=[-1,1]) translate([9*X,0,-6]) 
+                rotate([90,0,0]) cylinder(d=3.4,h=10,center=true);
+        }
+      }
+      for(X=[-1,1]) translate([15*X,0,0]){
+        cylinder(d=3.3, h=10,center=true);
+        translate([0,0,-7]) cylinder(d=6, h=12,center=true);
+      }
+    }
+  }
+}
+
+module crtouch_mount2(x_offset=0, z_offset=-4){
+//%translate([12,-2,0]) rotate([90,0,180]) import("../../printer/address/WanhoaD6Bltouch.stl");
+    rotate([90,0,0]){
+    difference(){
+      union(){
+        hull(){
+            for(X=[-1,1]) translate([15*X,0,-1]) 
+                cylinder(d=6, h=3);
+            translate([x_offset,z_offset+5,0.5]) 
+              for(X=[-1,1]) translate([10*X,0,0]) 
+                cylinder(d=6,h=3,center=true);
+        }
+        translate([x_offset,0,0]) difference(){
+          hull(){
+            for(X=[-1,1]) translate([15*X,0,-1]) 
+              cylinder(d=6, h=3);
+            translate([-14,z_offset,0]) cube([28,3,2]);
+            translate([0,z_offset+1.5,-9.5]) {
+              for(X=[-1,1]) translate([11*X,0,0]) 
+                rotate([90,0,0]) cylinder(d=6,h=3,center=true);
+              cube([8,3,10], center=true);
+            }
+          }
+        }
+        
+      }
+          for(X=[-1,1]) translate([15*X,0,-1]){
+            translate([0,0,-10]) cylinder(d=6.2, h=10);
+            translate([0,0,-2.5]) cylinder(d=3.3, h=6);
+          }
+          translate([0,5+z_offset,-3])
+            cube([14,abs(z_offset)+5,4],center=true);
+          translate([0,z_offset,-3])
+            for(X=[-1,1]) translate([9*X,0,-6]) rotate([90,0,0]){
+                cylinder(d=3.4,h=10,center=true);
+                translate([0,0,-8]) cylinder(d=6.3,h=10,center=true);
+            }
+        for(X=[-1,1]) translate([15*X,0,0]) 
+            cylinder(d=3.3, h=10,center=true);
+    }
+    translate([-14+x_offset,z_offset,0]) hull(){
+      translate([14,5,0.5]) for(X=[-1,1]) translate([11*X,0,0]) 
+        rotate([0,0,0]) cylinder(d=6,h=3,center=true);
+      translate([0,0,-1]) cube([28,3,3]);
+    }
+  }
+}
+
+module bltouch_mount(x_offset=0, z_offset=-13){
+//%translate([12,-2,0]) rotate([90,0,180]) import("../../printer/address/WanhoaD6Bltouch.stl");
+    rotate([90,0,0]){
+    difference(){
+        hull(){
+            for(X=[-1,1]) translate([15*X,0,-1]) 
+                cylinder(d=6, h=3);
+            translate([x_offset,z_offset+5,0.5]) 
+              for(X=[-1,1]) translate([10*X,0,0]) 
+                cylinder(d=6,h=3,center=true);
+        }
+        for(X=[-1,1]) translate([15*X,0,0]) 
+            cylinder(d=3.3, h=10,center=true);
+    }
+    translate([-13+x_offset,z_offset,0]) hull(){
+      translate([13,5,0.5]) for(X=[-1,1]) translate([10*X,0,0]) 
+        rotate([0,0,0]) cylinder(d=6,h=3,center=true);
+      translate([0,0,-1]) cube([26,3,3]);
+    }
+    translate([x_offset,0,0]) difference(){
+      hull(){
+        translate([-13,z_offset,0]) cube([26,3,2]);
+        translate([0,z_offset+1.5,-9.5]) {
+          for(X=[-1,1]) translate([10*X,0,0]) 
+            rotate([90,0,0]) cylinder(d=6,h=3,center=true);
+          cube([8,3,10], center=true);
+        }
+      }
+      translate([0,z_offset,-3])
+        cube([10,10,4],center=true);
+      translate([-1,z_offset,-3])
+        for(X=[-1,1]) translate([9*X,0,-6]) 
+            rotate([90,0,0]) cylinder(d=3,h=10,center=true);
+    }
+  }
+}
 
 module mmu(){
   offset=12;
@@ -77,8 +267,9 @@ module assembly(offset=-10){
   translate([0,-2,-12]) rotate([90,0,0])
     import("MPMU_D6_Helix_e3D_Body_v1.stl");
   translate([0,-2,-12]) rotate([90,0,0]) mmu();
-  pinda_mount(offset);
-  translate([0,10,-15+offset]) pinda();
+  bltouch_mount();
+//  pinda_mount(offset);
+//  translate([0,10,-15+offset]) pinda();
 }
 
 m3_hex_nut=5.6;

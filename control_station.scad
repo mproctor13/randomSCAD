@@ -11,14 +11,14 @@ pipe_dia=49; // 1.5" abs
 pipe_width=225;
 
 //model();
-handle();
+//handle();
 //open_end();
 //io_end();
 //end_cap();
 //handle();
 //monitor_mount();
 //ups_tie();
-//switch_mount(type=2);
+switch_mount(type=1);
 
 //translate([0,0,50]) monitor_mount();
 //pi_mount();

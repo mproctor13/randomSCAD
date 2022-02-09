@@ -8,13 +8,15 @@ race_height=10;
 holes=24;
 hole_diameter=3;
 
+//cutout_race();
 //difference(){
 //  union(){
 //    inside_race();
-    outside_race();
+//    outside_race();
 //  }
 //  cube(100);
 //}
+
 module inside_race(diameter=main_diameter, holes=holes, ball_dia=ball_dia,
                     offset=-0.5, race_spacing=race_spacing, 
                     race_width=race_width, race_height=race_height){
@@ -59,4 +61,19 @@ module outside_race(diameter=main_diameter, holes=holes, ball_dia=ball_dia,
           translate([0,diameter+ball_dia/2+(race_width-ball_dia/2)/2,-0.5]) 
             cylinder(d=hole_diameter, h=race_height+1);
   }
+}
+
+module cutout_race(diameter=main_diameter, ball_dia=ball_dia,
+                    race_spacing=race_spacing, race_height=race_height){
+    rotate_extrude()
+      translate([diameter,0,0]) {
+          translate([0,race_height/2,0]) 
+            circle(d=ball_dia+bextra);
+          translate([-race_spacing/2,0,0]) 
+          square([race_spacing,race_height+1]);
+        }
+      translate([0,diameter,race_height/2]){
+        cylinder(d=ball_dia+bextra, h=race_height);
+        cylinder(d=ball_dia/2, h=race_height*2, center=true);
+      }
 }
