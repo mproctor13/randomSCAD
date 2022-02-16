@@ -12,62 +12,18 @@ include <../threads.scad>
 include <../NewBearing/bearing_test.scad>
 
 
-$fn=120;
-nut();
-//difference(){
-//intersection(){
-//  spool_mount();
-//  translate([0,0,120]) cube([100,100,100], center=true);
-//}
-//  translate([0,0,100]) rotate([0,180,0]) nut();
-//  cube([50,50,100]);
-//}
-//metric_thread (diameter=40, pitch=5, length=20, angle=50);
-//translate([0,0,25 ]) metric_thread (diameter=40, pitch=4, length=20);
+$fn=$preview ? 30 : 120;
 
-//spool_internal();
+mmu_cover();
 
-module nut(thread_dia=40,tangle=50){
+module mmu_cover(){
   difference(){
     union(){
-      cylinder(d=70, h=5);
-      translate([0,0,5]) cylinder(d1=70, d2=thread_dia+2, h=20);
+      translate([5,-12,0]) import("MPMU_D6_Helix_e3D_HotendCover_v1.stl");
+      translate([0,0.5,13]) cube([10,10,sq_nutY+0.5], center=true);
     }
-    metric_thread(diameter=thread_dia+1, pitch=4, angle=tangle, length=50, square=false);
-  }
-}
-
-module spool_internal(thread_dia=40,length=75,tangle=50){
-  difference(){
-    union(){
-      translate([0,0,20]) cylinder(d=thread_dia-15,h=length+7);
-      translate([0,0,10]) cylinder(d1=46,d2=thread_dia-15,h=10);
-      translate([0,0,0]) cylinder(d=46,h=10);
-    }
-    translate([0,0,length+15]) cutout_race(diameter=13);
-    translate([0,0,10]) rotate([0,180,0]) cutout_race(diameter=23);
-    %translate([0,0,length/2-10]) cube([15,15,length], center=true);
-  }
-}
-
-module spool_mount(thread_dia=40,length=75,tangle=50){
-  difference(){
-    union(){
-      translate([0,0,25]) intersection(){
-        union(){
-          translate([0,0,length-5])
-            cylinder(d1=thread_dia, d2=thread_dia-5, h=10);
-          cylinder(d=thread_dia+5, h=length-5);
-        }
-        metric_thread(diameter=thread_dia, pitch=4, length=length, angle=tangle);
-      }
-      cylinder(d=70, h=5);
-      translate([0,0,5]) cylinder(d1=70, d2=thread_dia+2, h=20);
-    }
-    translate([0,0,-1]) cylinder(d=thread_dia-14,h=length+27);
-    translate([0,0,10]) cylinder(d=thread_dia-12,h=15+length-9);
-    translate([0,0,length+15]) cutout_race(diameter=13);
-    translate([0,0,10]) rotate([0,180,0]) cutout_race(diameter=23);
+    cylinder(d=3.3,h=20);
+    translate([0,5.5,10.5]) cube([sq_nutX+0.5,20,sq_nutY+0.5], center=true);
   }
 }
 
@@ -270,19 +226,4 @@ module assembly(offset=-10){
   bltouch_mount();
 //  pinda_mount(offset);
 //  translate([0,10,-15+offset]) pinda();
-}
-
-m3_hex_nut=5.6;
-m3_nut_height=2.25;
-m4_hex_nut=7.2;
-m4_nut_height=2.9;
-m5_hex_nut=7.8;
-m5_nut_height=3.9;
-
-module fhex(wid,height){
-  hull(){
-    cube([wid/1.7,wid,height],center=true);
-    rotate([0,0,120]) cube([wid/1.7,wid,height], center=true);
-    rotate([0,0,240]) cube([wid/1.7,wid,height], center=true);
-  }
 }
