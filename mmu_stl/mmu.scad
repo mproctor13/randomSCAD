@@ -14,7 +14,34 @@ include <../NewBearing/bearing_test.scad>
 
 $fn=$preview ? 30 : 120;
 
-mmu_cover();
+//mmu_cover();
+//crtouch_mount();
+//%bltouch_mount(x_offset=0, z_offset=-4);
+
+mmu_clip();
+module mmu_clip(width=7.4,offset=7){
+  %translate([-24.75,0,0]) import("../../d6/d6_ribbon_cable_clip_v2.stl");
+  difference(){
+    union(){
+      translate([-24.75,0,0]) import("../../d6/d6_ribbon_cable_clip_v2.stl");
+      hull(){
+        for(X=[-1,1]) translate([18.5*X,21+offset,0]) cylinder(d=3,h=width);
+        for(X=[-1,1]) translate([23*X,21,0]) cylinder(d=3,h=width);
+      }
+    }
+//    %translate([0,24,3.5]) cube([32,4,8],center=true);
+    for(X=[-1,1]) translate([22*X,20,width-1.8]) linear_extrude(height=2) text(text=str(offset),size=3,halign="center");
+    hull(){
+      for(X=[-1,1]) translate([15.5*X,18+offset,-0.1]) 
+        cylinder(d=3,h=width+0.2);
+      for(X=[-1,1]) translate([20*X,18,-0.1]) 
+        cylinder(d=3,h=width+0.2);
+    }
+  }
+  for(X=[-1,1]) translate([28.5*X,4,0])
+    hull() for(Y=[-1,1]) translate([0,1*Y,-0.1]) cylinder(d=3,h=width);
+  
+}
 
 module mmu_cover(){
   difference(){
